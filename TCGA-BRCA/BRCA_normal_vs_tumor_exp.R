@@ -81,7 +81,7 @@ p <- ggboxplot(test, x="Sample", y="TRIM45",outlier.shape = NA,
                     show.legend=F,
                     palette = c("#00CD00", "#EE2C2C"), 
                     order = c("Normal", "Tumor"),
-                    ylab = "Expression", title = "TRIM45",
+                    ylab = "TRIM45 Expression",
                ggtheme = theme_pubr(legend = "right")) +
         theme(legend.position = "none",
         plot.title = element_text(hjust = 0.5, face ="italic"), #Italic if it is a gene. 
@@ -89,12 +89,12 @@ p <- ggboxplot(test, x="Sample", y="TRIM45",outlier.shape = NA,
         axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10),
         axis.text.y = element_text(size = 10))+
   geom_signif(comparisons = my_comparisons,map_signif_level = T,y_position = c(6.5), textsize = 10)+ 
-  geom_jitter(shape = 21,stroke=0.2,size=1, aes(fill= Sample, alpha=0.9), position = position_jitter(width = 0.2, height = 0.5))
+  geom_jitter(shape = 21,stroke=0.1,size=2, aes(fill= Sample, alpha=0.7), position = position_jitter(width = 0.2, height = 0.5))
 
 
 
 p
-pdf("TRIM45_exp_normal_vs_tumor_v2.pdf", height = 5, width = 5)
+pdf("TRIM45_exp_normal_vs_tumor.pdf", height = 5, width = 5)
 print(p)
 dev.off()
 
