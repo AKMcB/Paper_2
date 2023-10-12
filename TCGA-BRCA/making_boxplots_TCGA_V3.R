@@ -47,7 +47,7 @@ t_genes1<- tibble::rownames_to_column(t_genes1, "id")
 merged <- merge(t_genes_interactors, t_genes1, by.x = "id", by.y = "id")
 
 
-write.csv(merged, "TRIM_interactors_autophagy.csv")
+#write.csv(merged, "TRIM_interactors_autophagy.csv")
 
 ##Import the info file
 ids <- read.csv("TCGA_BRCA_Updated_Clinical_Data.csv", sep=";", as.is = T, check.names = F)
@@ -95,7 +95,7 @@ p <- ggboxplot(merged, x="PAM50", y="TRIM45",outlier.shape = NA,
         axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 11),
         axis.text.y = element_text(size = 10))+
   geom_signif(comparisons = my_comparisons,map_signif_level = T, y_position = c(7.0, 7.4,7.8, 5.9,6.3,6.7,5.9), textsize=10)+ 
-  geom_jitter(shape = 21,stroke=0.2,size=2, aes(fill= PAM50, alpha=0.7), position = position_jitter(width = 0.3, height = 0.5))
+  geom_jitter(shape = 21,stroke=0.1,size=3, aes(fill= PAM50, alpha=0.5), position = position_jitter(width = 0.3, height = 0.5))
 
 
 p 
