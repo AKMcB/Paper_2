@@ -25,7 +25,6 @@ t45 <- t45[!t45$Differentiation %in% c("Mixed", "Non-Epithelial"),] #We are only
 colnames(t45)[8] <- "Cancer Code"
 
 p <- ggboxplot(t45, x="Cancer Code", y="TRIM45", outlier.shape = NA,
-          fill ="Cancer Code",
           palette = c("#A50026", "#D73027", "#F46D43", "#FDAE61", "#FEE090", "#FFD92F", "#E0F3F8", "#ABD9E9",
                       "#74ADD1", "#4575B4", "#8DA0CB", "#E78AC3", "#762A83", "#9970AB", "#C2A5CF", "#E7D4E8",
                       "#F7F7F7", "#D9F0D3", "#A6DBA0", "#5AAE61", "#1B7837", "#4DAC26", "#80CDC1", "#35978F",
@@ -39,14 +38,14 @@ p <- ggboxplot(t45, x="Cancer Code", y="TRIM45", outlier.shape = NA,
         axis.text.x = element_text(size=10, angle = 90), axis.ticks.x=element_blank(), 
         axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10),
         axis.text.y = element_text(size = 10))+
-  geom_jitter(shape = 21,stroke=0.5,size=1.5, aes(fill= t45$`Cancer Code`, alpha=0.7), position = position_jitter(width = 0.2, height = 0.5))+
+  geom_jitter(shape = 21,stroke=0.5,size=2, aes(fill= t45$`Cancer Code`, alpha=0.5), position = position_jitter(width = 0.3, height = 0.5))+
   scale_x_reordered()+ 
   stat_compare_means(method = "anova", 
                      label.x.npc = "center",
                      label.y.npc = "top", vjust = 1.0, hjust = 0.5)
 p
 
-pdf("TRIM45_exp_CCLE.pdf", height = 5, width = 5)
+pdf("TRIM45_exp_CCLE_2.pdf", height = 5, width = 8)
 print(p)
 dev.off()
 
