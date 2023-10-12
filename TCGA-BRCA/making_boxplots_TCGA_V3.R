@@ -70,37 +70,37 @@ write.csv(merged, "TRIM27_autophagy_receptors_TCGA.csv")
 #Make the boxplot
 merged$BRCA_Subtype_PAM50    <- factor(merged$BRCA_Subtype_PAM50, 
                                                 levels= c("LumA", "LumB", "Her2", "Basal", "Normal"), 
-                                                labels = c("Luminal A", "Luminal B", "HER2", "Basal", "Normal"))
+                                                labels = c("Luminal A", "Luminal B", "HER2-enriched", "Basal-like", "Normal-like"))
 
-my_comparisons <- list( c("Luminal A", "HER2"),
-                        c("Luminal A", "Basal"),
-                        c("Luminal A", "Normal"),
-                        c("Luminal B", "HER2"),
-                        c("Luminal B", "Basal"),
-                        c("Luminal B", "Normal"),
+my_comparisons <- list( c("Luminal A", "HER2-enriched"),
+                        c("Luminal A", "Basal-like"),
+                        c("Luminal A", "Normal-like"),
+                        c("Luminal B", "HER2-enriched"),
+                        c("Luminal B", "Basal-like"),
+                        c("Luminal B", "Normal-like"),
                         c("Luminal A", "Luminal B")) 
 symnum.args <- list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1), 
                     symbols = c("****", "***", "**", "*", "ns"))
 
 colnames(merged)[4] <- "PAM50"
 
-p <- ggboxplot(merged, x="PAM50", y="TRIM45",add="jitter", add.params = list(alpha=0.7,size=2),
-               color = "black", shape = 21,
-               fill="PAM50", palette = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"), 
-               order = c("Luminal A", "Luminal B","HER2", "Basal", "Normal"),
-               ylab = "Expression", xlab = "PAM50", title = "TRIM45",
+p <- ggboxplot(merged, x="PAM50", y="TRIM45",outlier.shape = NA,
+               palette = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"), 
+               order = c("Luminal A", "Luminal B","HER2-enriched", "Basal-like", "Normal-like"),
+               ylab = "TRIM45 Expression", xlab = "PAM50", title = "TCGA-BRCA",
                ggtheme = theme_pubr(legend = "right")) +
-  theme(legend.position = "bottom",
+  theme(legend.position = "none",
         plot.title = element_text(hjust = 0.5, face ="italic"), #Italic if it is a gene. 
         axis.text.x = element_text(size=10), axis.ticks.x=element_blank(), 
         axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 11),
         axis.text.y = element_text(size = 10))+
-  geom_signif(comparisons = my_comparisons,map_signif_level = T, y_position = c(7.0, 7.4,7.8, 5.9,6.3,6.7,5.9), textsize=4)
+  geom_signif(comparisons = my_comparisons,map_signif_level = T, y_position = c(7.0, 7.4,7.8, 5.9,6.3,6.7,5.9), textsize=10)+ 
+  geom_jitter(shape = 21,stroke=0.2,size=2, aes(fill= PAM50, alpha=0.7), position = position_jitter(width = 0.3, height = 0.5))
 
 
 p 
 
-pdf("TRIM45_exp_TCGA_BRCA_PAM50.pdf", height = 6, width = 6)
+pdf("TRIM45_exp_TCGA_BRCA_PAM50_2.pdf", height = 6, width = 6)
 print(p)
 dev.off()
 
