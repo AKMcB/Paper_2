@@ -84,13 +84,13 @@ merged <- read.csv2("info_Metabric.csv", sep=";", as.is = T, check.names = F)
 
 merged$PAM50    <- factor(merged$PAM50, 
                                        levels= c("LumA", "LumB", "Her2", "Basal", "Normal"), 
-                                       labels = c("Luminal A", "Luminal B", "HER2", "Basal", "Normal"))
-my_comparisons <- list( c("Luminal A", "HER2"),
-                        c("Luminal A", "Basal"),
-                        c("Luminal A", "Normal"),
-                        c("Luminal B", "HER2"),
-                        c("Luminal B", "Basal"),
-                        c("Luminal B", "Normal"),
+                                       labels = c("Luminal A", "Luminal B", "HER2-enriched", "Basal-like", "Normal-like"))
+my_comparisons <- list( c("Luminal A", "HER2-enriched"),
+                        c("Luminal A", "Basal-like"),
+                        c("Luminal A", "Normal-like"),
+                        c("Luminal B", "HER2-enriched"),
+                        c("Luminal B", "Basal-like"),
+                        c("Luminal B", "Normal-like"),
                         c("Luminal A", "Luminal B")) 
 symnum.args <- list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1), 
                     symbols = c("****", "***", "**", "*", "ns"))
@@ -100,23 +100,25 @@ symnum.args <- list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1),
 #merged$`PAM50 Subtype` <- ifelse(merged$`PAM50 Subtype` == "NC", NA, merged$`PAM50 Subtype`)
 merged <- merged[complete.cases(merged), ]
 
-p <- ggboxplot(merged, x="PAM50", y="TRIM45",add="jitter", add.params = list(alpha=0.7,size=2),
-               color = "black", shape = 21,
-               fill="PAM50", palette = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"), 
-               order = c("Luminal A", "Luminal B","HER2", "Basal", "Normal"),
-               ylab = "Expression", xlab = "PAM50", title = "TRIM45",
+p <- ggboxplot(merged, x="PAM50", y="TRIM45",outlier.shape = NA,
+               palette = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"), 
+               order = c("Luminal A", "Luminal B","HER2-enriched", "Basal-like", "Normal-like"),
+               ylab = "TRIM45 Expression", xlab = "PAM50", title = "METABRIC",
                ggtheme = theme_pubr(legend = "right")) +
-  theme(legend.position = "bottom",
-        plot.title = element_text(hjust = 0.5, face ="italic"), #Italic if it is a gene. 
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5), #Italic if it is a gene. 
         axis.text.x = element_text(size=10), axis.ticks.x=element_blank(), 
         axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 11),
         axis.text.y = element_text(size = 10))+
-  geom_signif(comparisons = my_comparisons,map_signif_level = T, y_position = c(10.0, 10.3,10.6, 9.2,9.5,9.8,9.2), textsize=4)
+  geom_signif(comparisons = my_comparisons,map_signif_level = T, y_position = c(10.0, 10.3,10.6, 9.2,9.5,9.8,9.2), 
+              textsize=10)+ 
+  geom_jitter(shape = 21,stroke=0.1,size=3, aes(fill= PAM50, alpha=0.5), 
+              position = position_jitter(width = 0.3, height = 0.5))
   
 
 p 
 
-pdf("TRIM45_exp_metabric_PAM50.pdf", height = 6, width = 6)
+pdf("TRIM45_exp_metabric_PAM50_2.pdf", height = 6, width = 6)
 print(p)
 dev.off()
 ggexport(p, filename = "TRIM45_exp_PAM50_subtype_Metabric.png",res = 200, height = 2000, width = 2000)
