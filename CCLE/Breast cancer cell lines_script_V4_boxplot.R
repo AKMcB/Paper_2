@@ -6,6 +6,7 @@ library(ggpubr)
 library(tidyverse)
 
 #Dataset
+setwd("C:/Users/abe186/UiT Office 365/O365-Bioinformatikk TRIM27 - General/Cancer cell lines cyclopedia/Data files")
 expr <- read.csv2("BCCL_filtered_log2.csv", sep=";", as.is = T, check.names = F)
 
 genes<- subset(expr, expr$Name %in% c("TRIM45", "TRIM27", "TRIM32"))
@@ -42,10 +43,10 @@ str(merged)
 
 merged$lineage_molecular_subtype      <- factor(merged$lineage_molecular_subtype, 
                                               levels= c("HER2_amp", "basal_A", "basal_B", "luminal"), 
-                                              labels = c("HER2", "Basal A", "Basal B", "Luminal"))
+                                              labels = c("HER2-enriched", "Basal A", "Basal B", "Luminal"))
 
 
-my_comparisons <- list( c("Luminal", "HER2"),
+my_comparisons <- list( c("Luminal", "HER2-enriched"),
                         c("Luminal", "Basal A"),
                         c("Luminal", "Basal B")) 
 symnum.args <- list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1), 
@@ -53,23 +54,23 @@ symnum.args <- list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1),
 
 colnames(merged)[5] <- "PAM50"
 
-p <- ggboxplot(merged, x="PAM50", y="TRIM45",add="jitter", add.params = list(alpha=0.7,size=2),
-               color = "black", shape = 21,
-               fill="PAM50", palette = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"), 
-               order = c("Luminal","HER2", "Basal A", "Basal B"),
-               ylab = "Expression", xlab = "PAM50", title = "TRIM45",
+p <- ggboxplot(merged, x="PAM50", y="TRIM45",outlier.shape = NA,
+               palette = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"), 
+               order = c("Luminal","HER2-enriched", "Basal A", "Basal B"),
+               ylab = "TRIM45 Expression", xlab = "PAM50", title = "BCCL",
                ggtheme = theme_pubr(legend = "right")) +
-  theme(legend.position = "bottom",
+  theme(legend.position = "none",
         plot.title = element_text(hjust = 0.5, face ="italic"), #Italic if it is a gene. 
         axis.text.x = element_text(size=10), axis.ticks.x=element_blank(), 
         axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 11),
         axis.text.y = element_text(size = 10))+
-  geom_signif(comparisons = my_comparisons,map_signif_level = T, y_position = c(4.0, 4.3,4.6), textsize=4)
+  geom_signif(comparisons = my_comparisons,map_signif_level = T, y_position = c(3.8, 4.1,4.4), textsize=10)+
+  geom_jitter(shape = 21,stroke=0.2,size=2, aes(fill= PAM50, alpha=0.7), position = position_jitter(width = 0.3, height = 0.5))
 
 
 p 
 
-pdf("TRIM45_exp_BCCL_PAM50.pdf", height = 5, width = 5)
+pdf("TRIM45_exp_BCCL_PAM50_2.pdf", height = 6, width = 6)
 print(p)
 dev.off()
 
