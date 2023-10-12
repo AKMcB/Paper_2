@@ -43,12 +43,12 @@ str(merged)
 
 merged$lineage_molecular_subtype      <- factor(merged$lineage_molecular_subtype, 
                                               levels= c("HER2_amp", "basal_A", "basal_B", "luminal"), 
-                                              labels = c("HER2-enriched", "Basal A", "Basal B", "Luminal"))
+                                              labels = c("HER2-enriched", "Basal-like A", "Basal-like B", "Luminal"))
 
 
 my_comparisons <- list( c("Luminal", "HER2-enriched"),
-                        c("Luminal", "Basal A"),
-                        c("Luminal", "Basal B")) 
+                        c("Luminal", "Basal-like A"),
+                        c("Luminal", "Basal-like B")) 
 symnum.args <- list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1), 
                     symbols = c("****", "***", "**", "*", "ns"))
 
@@ -56,7 +56,7 @@ colnames(merged)[5] <- "PAM50"
 
 p <- ggboxplot(merged, x="PAM50", y="TRIM45",outlier.shape = NA,
                palette = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"), 
-               order = c("Luminal","HER2-enriched", "Basal A", "Basal B"),
+               order = c("Luminal","HER2-enriched", "Basal-like A", "Basal-like B"),
                ylab = "TRIM45 Expression", xlab = "PAM50", title = "BCCL",
                ggtheme = theme_pubr(legend = "right")) +
   theme(legend.position = "none",
@@ -65,7 +65,8 @@ p <- ggboxplot(merged, x="PAM50", y="TRIM45",outlier.shape = NA,
         axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 11),
         axis.text.y = element_text(size = 10))+
   geom_signif(comparisons = my_comparisons,map_signif_level = T, y_position = c(3.8, 4.1,4.4), textsize=10)+
-  geom_jitter(shape = 21,stroke=0.2,size=2, aes(fill= PAM50, alpha=0.7), position = position_jitter(width = 0.3, height = 0.5))
+  geom_jitter(shape = 21,stroke=0.1,size=3, aes(fill= PAM50, alpha=0.7), 
+              position = position_jitter(width = 0.3, height = 0.5))
 
 
 p 
