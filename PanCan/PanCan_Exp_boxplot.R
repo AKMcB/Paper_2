@@ -27,7 +27,7 @@ merged <- merged[order(merged$TRIM45, decreasing = TRUE),]
 
 colnames(merged)[5] <- "primary_disease"
 
-fac <- with(merged, reorder(primary_disease, TRIM45, median, order = F))
+fac <- with(merged, reorder(primary_disease, TRIM45, median, order = T))
 merged$primary_disease <- factor(merged$primary_disease, levels = levels(fac))
 #label(merged$primary_disease) <- "Primary Disease"
 
@@ -61,7 +61,7 @@ p <- ggboxplot(merged, x="primary_disease", y="TRIM45",outlier.shape = NA,
 
 p
 
-pdf("PanCan_TRIM45.pdf", height = 8, width = 8)
+pdf("PanCan_TRIM45_2.pdf", height = 6, width = 8)
 print(p)
 dev.off()
 
