@@ -4,9 +4,10 @@ library(ggpubr)
 library(ggplot2)
 library(tidytext)
 library(Hmisc)
+library(data.table)
 #Start here when working with new genes----------------------------------------------------------------------
 setwd("C:/Users/abe186/UiT Office 365/O365-Bioinformatikk TRIM27 - General/pancanAtlasHub")
-merged_1 <- read.delim("EB++AdjustPANCAN_IlluminaHiSeq_RNASeqV2.geneExp.xena")
+merged_1 <- as.data.frame(fread("EB++AdjustPANCAN_IlluminaHiSeq_RNASeqV2.geneExp.xena"))
 
 df <- subset(merged_1, merged_1$sample == "TRIM45")
 rownames(df) <- df$sample
@@ -55,7 +56,7 @@ p <- ggboxplot(merged, x="primary_disease", y="TRIM45",outlier.shape = NA,
         axis.text.x = element_text(vjust = 0.5,angle = 90, size = 10), axis.ticks.x=element_blank(), 
         axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 11),
         axis.text.y = element_text(size = 10))+
-          stat_compare_means(method = "anova", 
+          stat_compare_means(method = "anova",
                      label.x.npc = "center",
                      label.y.npc = "top", vjust = 1.0, hjust = 0.5)
 
