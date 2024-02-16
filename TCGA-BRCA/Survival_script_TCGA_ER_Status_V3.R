@@ -22,25 +22,26 @@ info_rec <- info[,-c(2:44)]
 #Merge the genes and infor file based on patient ID 
 genes <- tibble::rownames_to_column(genes, "ID")
 merged <- merge(genes, info_rec, by.x= "ID", by.y = "TCGA_id")
-write.csv2(merged, "TRIM45_receptor status_TCGA_clinical.csv")
+#write.csv2(merged, "TRIM45_receptor status_TCGA_clinical.csv")
 #merged<- read.csv2("TRIM45_receptor status_TCGA_clinical.csv",sep = ";", as.is = T, check.names = F)
 #merged <- merged[,-1]
-rownames(merged) <- merged[,1]
-merged <- merged[,-1]
+#rownames(merged) <- merged[,1]
+#merged <- merged[,-1]
 
 
 #Subset info file to obtain DSS and PFI 
 info_dss <- info[,c(1,29,30,33,34)]
 
 #Merge the merged file and the info_dss file 
+merged <- tibble::rownames_to_column(merged, "ID")
 ER <- merge(merged, info_dss, by.x= "ID", by.y = "TCGA_id")
 
 
 #Subset df based on either DSS or PFI
-ER_DSS <- ER[,-c(3,7,8)]
+ER_DSS <- ER[,-c(9,10)]
 
 
-ER_DSS_pos <- subset(ER_DSS, ER_DSS$DSS.time > 0)
+#ER_DSS_pos <- subset(ER_DSS, ER_DSS$DSS.time > 0)
 
 # 1)Subset ER_DSS and ER_PFI based on positive ER status 
 ER_DSS_pos <- subset(ER_DSS, ER_DSS$er_status_by_ihc %in% "Positive")
