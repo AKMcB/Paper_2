@@ -1,23 +1,18 @@
-library(dplyr)
-library(forcats)
-library(biomaRt)
-library(ggplot2)
+####################
+## Load libraries ##
+####################
+
 library(ggpubr)
 library(tidyverse)
 
-#Dataset
+##########################
+## Load expression data ##
+##########################
+
 setwd("C:/Users/abe186/UiT Office 365/O365-Bioinformatikk TRIM27 - General/Cancer cell lines cyclopedia/Data files")
 expr <- read.csv2("BCCL_filtered_log2.csv", sep=";", as.is = T, check.names = F)
 
 genes<- subset(expr, expr$Name %in% c("TRIM45", "TRIM27", "TRIM32"))
-
-genes<- subset(expr, expr$Name %in% c("ATG2A", "ATG2B", "ATG3", "ATG4A", "ATG4B"
-                                      , "ATG4C", "ATG4D", "ATG5", "ATG7","ATG9A","ATG9B",
-                                      "ATG10", "ATG12", "ATG13", "ATG14", "ATG16L1",
-                                      "ATG16L2", "ATG101", "ULK1", "BECN1", "RB1CC1",
-                                        "WIPI1", "WIPI2", "WDR45B", "WDR45", "MAP1LC3A",
-                                      "MAP1LC3B", "MAP1LC3C","GABARAP", "GABARAPL1", 
-                                      "GABARAPL2"))
 
 rownames(genes) <- genes[,1]
 genes <- genes[,-1]
@@ -25,10 +20,10 @@ t_genes<- t(genes)
 t_genes<- as.data.frame(t_genes)
 t_genes <- tibble::rownames_to_column(t_genes, "id")
 
-write.csv2(t_genes, "t_autophagy proteins.csv")
-t_genes<- read.csv2("t_autophagy proteins.csv", sep=";", as.is = T, check.names = F)
+######################
+## Read sample info ##
+######################
 
-#Sample info 
 ids <- read.csv("sample_info.csv", sep=";", as.is = T, check.names = F)
 ids<- ids[ ,c(2,4,21)]
 info_BC<- subset(ids, ids$CCLE_Name %in% t_genes$id)
@@ -54,24 +49,26 @@ symnum.args <- list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1),
 
 colnames(merged)[5] <- "PAM50"
 
-p <- ggboxplot(merged, x="PAM50", y="TRIM45",outlier.shape = NA,
-               palette = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"), 
-               order = c("Luminal","HER2-enriched", "Basal-like A", "Basal-like B"),
-               ylab = "TRIM45 Expression", xlab = "PAM50", title = "BCCL",
-               ggtheme = theme_pubr(legend = "right")) +
-  theme(legend.position = "none",
-        plot.title = element_text(hjust = 0.5, face ="italic"), #Italic if it is a gene. 
-        axis.text.x = element_text(size=10), axis.ticks.x=element_blank(), 
-        axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 11),
-        axis.text.y = element_text(size = 10))+
-  geom_signif(comparisons = my_comparisons,map_signif_level = T, y_position = c(3.8, 4.1,4.4), textsize=10)+
-  geom_jitter(shape = 21,stroke=0.1,size=3, aes(fill= PAM50, alpha=0.7), 
-              position = position_jitter(width = 0.3, height = 0.5))
 
+
+p <- ggplot(merged, aes(x = PAM50, y = TRIM45, fill = PAM50))+
+  geom_point(alpha=0.5,position = position_jitter(width = 0.3, height = 0.5), shape= 21, size= 3)+
+  geom_boxplot(fill = "white", alpha = 0.8, outlier.shape = NA) +
+  labs(y = "TRIM45 (log2+1)", x = "PAM50", title = "BCCL") + 
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5, face ="bold"), 
+        axis.text.x = element_text(size=10), axis.ticks.x=element_blank(), 
+        axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 11, face ="italic"),#Italic if it is a gene. 
+        axis.text.y = element_text(size = 10), 
+        panel.background = element_rect(fill = "white",
+                                        colour = "white"),
+        axis.line = element_line(linewidth = 0.7, linetype = "solid",
+                                 colour = "black")) +
+  scale_fill_manual(values = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"))
 
 p 
 
-pdf("TRIM45_exp_BCCL_PAM50_2.pdf", height = 6, width = 6)
+pdf("TRIM45_exp_BCCL_PAM50_3.pdf", height = 6, width = 6)
 print(p)
 dev.off()
 
