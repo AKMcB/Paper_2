@@ -75,7 +75,7 @@ symnum.args <- list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1),
 colnames(merged)[2] <- "PAM50"
 
 
-ggplot(merged, aes(x = PAM50, y = TRIM45, fill = PAM50))+
+p <- ggplot(merged, aes(x = PAM50, y = TRIM45, fill = PAM50))+
   geom_point(alpha=0.5,position = position_jitter(width = 0.3, height = 0.5), shape= 21, size= 3)+
   geom_boxplot(fill = "white", alpha = 0.8, outlier.shape = NA) +
   labs(y = "TRIM45 (log2+1)", x = "PAM50", title = "TCGA-BRCA") + 
@@ -91,6 +91,8 @@ ggplot(merged, aes(x = PAM50, y = TRIM45, fill = PAM50))+
   scale_fill_manual(values = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"))
   
 
+
+p 
 
 pdf("TRIM45_exp_TCGA_BRCA_PAM50_3.pdf", height = 6, width = 6)
 print(p)
