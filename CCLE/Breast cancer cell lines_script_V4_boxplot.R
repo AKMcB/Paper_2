@@ -37,8 +37,8 @@ merged<- merged[,-1]
 str(merged)
 
 merged$lineage_molecular_subtype      <- factor(merged$lineage_molecular_subtype, 
-                                              levels= c("HER2_amp", "basal_A", "basal_B", "luminal"), 
-                                              labels = c("HER2-enriched", "Basal-like A", "Basal-like B", "Luminal"))
+                                              levels= c("luminal","HER2_amp", "basal_A", "basal_B"), 
+                                              labels = c("Luminal","HER2-enriched", "Basal-like A", "Basal-like B" ))
 
 
 my_comparisons <- list( c("Luminal", "HER2-enriched"),
