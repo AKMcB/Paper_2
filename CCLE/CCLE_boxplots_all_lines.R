@@ -17,7 +17,7 @@ t45 <-t45[order(t45t$TRIM45, decreasing = TRUE),]
 str(t45)
 
 
-fac <- with(t45, reorder(OncotreeCode, TRIM45, median, order = TRUE))
+fac <- with(t45, reorder(OncotreeCode, TRIM45, median, decreasing = TRUE))
 t45$OncotreeCode <- factor(t45$OncotreeCode, levels = levels(fac))
 
 t45 <- t45[!t45$Differentiation %in% c("Mixed", "Non-Epithelial"),] #We are only interested in epthelial cells
@@ -45,7 +45,7 @@ p <- ggboxplot(t45, x="Cancer Code", y="TRIM45", outlier.shape = NA,
                      label.y.npc = "top", vjust = 1.0, hjust = 0.5)
 p
 
-pdf("TRIM45_exp_CCLE_2.pdf", height = 5, width = 8)
+pdf("TRIM45_exp_CCLE_3.pdf", height = 5, width = 8)
 print(p)
 dev.off()
 
