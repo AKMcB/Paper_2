@@ -13,7 +13,7 @@ dup<-t45[duplicated(t45$ID),] #Check for duplicate samples
 t45 <- t45[!t45$OncotreeCode %in% c("ACC", "CHOL"),] #Only one sample with these codes, have to be removed
 
 t45$TRIM45<- as.numeric(t45$TRIM45)
-t45 <-t45[order(t45t$TRIM45, decreasing = TRUE),]
+t45 <-t45[order(t45$TRIM45, decreasing = TRUE),]
 str(t45)
 
 
@@ -45,7 +45,7 @@ p <- ggboxplot(t45, x="Cancer Code", y="TRIM45", outlier.shape = NA,
                      label.y.npc = "top", vjust = 1.0, hjust = 0.5)
 p
 
-pdf("TRIM45_exp_CCLE_3.pdf", height = 5, width = 8)
+pdf("TRIM45_exp_CCLE_4.pdf", height = 4, width = 7)
 print(p)
 dev.off()
 
