@@ -8,8 +8,7 @@ library(tidyverse)
 ##########################
 ## Load expression data ##
 ##########################
-?fread
-setwexprsetwd("C:/Users/abe186/UiT Office 365/O365-Bioinformatikk TRIM27 - General/TCGA-BRCA/Raw data")
+setwd("C:/Users/abe186/UiT Office 365/O365-Bioinformatikk TRIM27 - General/TCGA-BRCA/Raw data")
 expr <- read.csv2("gdc_brca_expr_edit.csv", as.is = TRUE, check.names = FALSE)
 expr <- expr[,-1]
 expr <- distinct(expr,gene,.keep_all = T)
@@ -88,7 +87,8 @@ p <- ggplot(merged, aes(x = PAM50, y = TRIM45, fill = PAM50))+
                                         colour = "white"),
         axis.line = element_line(linewidth = 0.7, linetype = "solid",
                                  colour = "black")) +
-  scale_fill_manual(values = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"))
+  scale_fill_manual(values = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"))+
+  geom_signif(comparisons = my_comparisons,map_signif_level = T, y_position = c(7.0, 7.4,7.8, 5.9,6.3,6.7,5.9), textsize=10)
   
 
 
