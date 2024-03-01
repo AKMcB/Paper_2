@@ -104,7 +104,9 @@ p <- ggplot(merged, aes(x = PAM50, y = TRIM45, fill = PAM50))+
                                         colour = "white"),
         axis.line = element_line(linewidth = 0.7, linetype = "solid",
                                  colour = "black")) +
-  scale_fill_manual(values = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"))
+  scale_fill_manual(values = c("#00AFBB", "#E7B800", "#FC4E07", "#A0D636","#DF2DE0","#333ED4"))+ 
+  geom_signif(comparisons = my_comparisons,map_signif_level = T, y_position = c(10.0, 10.3,10.6, 9.2,9.5,9.8,9.2), 
+              textsize=10)
 
 p 
 
