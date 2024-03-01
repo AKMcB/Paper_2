@@ -65,7 +65,7 @@ p <- ggboxplot(merged, x="cancer_type", y="TRIM45",outlier.shape = NA,
 
 p
 
-pdf("PanCan_TRIM45_3.pdf", height = 6, width = 8)
+pdf("PanCan_TRIM45_4.pdf", height = 4, width = 7)
 print(p)
 dev.off()
 
