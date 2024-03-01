@@ -33,7 +33,7 @@ merged <- merge(genes, info_rec, by.x= "ID", by.y = "TCGA_id")
 info_dss <- info[,c(1,29,30,33,34)]
 
 #Merge the merged file and the info_dss file 
-merged <- tibble::rownames_to_column(merged, "ID")
+#merged <- tibble::rownames_to_column(merged, "ID")
 ER <- merge(merged, info_dss, by.x= "ID", by.y = "TCGA_id")
 
 
@@ -71,8 +71,8 @@ p <- ggsurvplot(fit = survival_fit_DSS_pos,
            title = "ER-Positive Patients",
            xlab = "Years", 
            ylab = "DSS Probability", 
-           ylim=c(0.3,1), xlim=c(0,25), 
-           pval.coord=c(0,0.32), 
+           ylim=c(0.8,1), xlim=c(0,5.2), 
+           pval.coord=c(0,0.81), 
            conf.int = T, risk.table = T, 
            legend.labs=c("High TRIM45", "Low TRIM45"),
            legend.title="TRIM45 Expression",
@@ -80,13 +80,14 @@ p <- ggsurvplot(fit = survival_fit_DSS_pos,
            risk.table.y.text = TRUE, risk.table.title="",
            risk.table.height=0.15, 
            risk.table.fontsize=3.5, 
+           break.x.by= 1,
            tables.theme = theme(axis.text.x = element_blank(), axis.ticks.x=element_blank(), 
                                 axis.title.x = element_blank(), axis.title.y = element_blank(),
                                 axis.text.y = element_text(size = 10)),font.x=10, font.y=11, font.tickslab=10)
 
 p
 
-pdf("TRIM45_ER_pos_DSS_TCGA_2.pdf", width = 8, height = 7, onefile = F)
+pdf("TRIM45_ER_pos_DSS_TCGA_3_5_years.pdf", width = 8, height = 7, onefile = F)
 print(p)
 dev.off()
 
