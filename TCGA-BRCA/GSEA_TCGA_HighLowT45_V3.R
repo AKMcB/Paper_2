@@ -100,21 +100,3 @@ write.csv2(HER, "HighLow_TRIM45_ER_pos_HER_neg_TCGA.csv")
 #Save phenotype file 
 write.csv2(pheno_her, "HighLow_TRIM45_ER_pos_HER_neg_pheno.csv")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
