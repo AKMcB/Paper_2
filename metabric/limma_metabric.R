@@ -32,7 +32,10 @@ expr$Hugo_Symbol <- NULL
 expr_1 <- as.data.frame(complete.cases(expr)) #7samples have NAs expression 
 expr <- na.omit(expr) #remove the seven genes
 
-#Read clinical file 
+#################
+# Clinical file #
+#################
+
 info <- read.csv2("brca_metabric_clinical_data.csv",sep = ";", as.is = T, check.names = F)
 info_rec <- info[,-c(1,3:9,11)]
 info_rec <- info_rec[,-c(5:30)]
@@ -69,7 +72,43 @@ merged <- merged %>% arrange(TRIM45_expression)
 expr<- expr[,rownames(merged)]
 all(rownames(merged) == colnames(expr))
 
-#make group information 
+#######
+# PCA #
+#######
+pca <- prcomp(
+  t(expr), # transpose our data frame to obtain PC scores for samples, not genes
+  scale = TRUE # we want the data scaled to have unit variance for each gene
+)
+pca_summary <- summary(pca)
+pca_summary$importance[, 1:100]
+
+merged <- rownames_to_column(merged, "id")
+meerged <- as.matrix(merged)
+expr <- as.matrix(expr)
+
+pca_df <- data.frame(pca$x[,1:2]) %>%
+  # Turn samples IDs stored as row names into a column
+  tibble::rownames_to_column("id") %>%
+  # Bring only the variables that we want from the metadata into this data frame
+  # here we are going to join by `refinebio_accession_code` values
+  dplyr::inner_join(
+    dplyr::select(merged, id, TRIM45_expression, `Pam50 + Claudin-low subtype`),
+    by = "id"
+  )
+
+pca_plot <- ggplot(pca_df,aes(x = PC1,y = PC2, color = TRIM45_expression)) +
+  geom_point() + # Plot individual points to make a scatterplot
+  theme_classic() # Format as a classic-looking plot with no gridlines
+
+# Print out the plot here
+pca_plot
+
+ggsave("pca_t45_level_metabric_top_bottom_25.pdf",plot = pca_plot)
+
+###################
+# Make group info #
+###################
+
 group <- as.factor(merged$TRIM45_expression)
 subtype <- as.factor(merged$`Pam50 + Claudin-low subtype`)
 
@@ -80,10 +119,10 @@ colnames(design) <- c("High", "Low","HER2_Enriched", "Luminal_A", "Luminal_B", "
 contr <- makeContrasts(High - Low, levels = design)
 contr
 
-
 #########
 # Limma #
 #########
+
 fit <- lmFit(expr, design)
 fit.contr <- contrasts.fit(fit, contr)
 fit.contr <- eBayes(fit.contr)
@@ -120,38 +159,3 @@ dev.off()
 png("volcanoplot_limma_metabric_er_positive_top_bottom_t45_level_no_corr.png",res= 200, heigh = 2000, width =1800)
 print(v)
 dev.off()
-
-
-
-pca <- prcomp(
-  t(expr), # transpose our data frame to obtain PC scores for samples, not genes
-  scale = TRUE # we want the data scaled to have unit variance for each gene
-)
-pca_summary <- summary(pca)
-pca_summary$importance[, 1:100]
-
-merged <- rownames_to_column(merged, "id")
-meerged <- as.matrix(merged)
-expr <- as.matrix(expr)
-
-pca_df <- data.frame(pca$x[,1:2]) %>%
-  # Turn samples IDs stored as row names into a column
-  tibble::rownames_to_column("id") %>%
-  # Bring only the variables that we want from the metadata into this data frame
-  # here we are going to join by `refinebio_accession_code` values
-  dplyr::inner_join(
-    dplyr::select(merged, id, TRIM45_expression, `Pam50 + Claudin-low subtype`),
-    by = "id"
-  )
-
-
-pca_plot <- ggplot(pca_df,aes(x = PC1,y = PC2, color = TRIM45_expression)) +
-  geom_point() + # Plot individual points to make a scatterplot
-  theme_classic() # Format as a classic-looking plot with no gridlines
-
-# Print out the plot here
-pca_plot
-
-
-ggsave("pca_t45_level_metabric_top_bottom_25.pdf",plot = pca_plot)
-
