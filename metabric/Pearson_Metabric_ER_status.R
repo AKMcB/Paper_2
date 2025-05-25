@@ -1,12 +1,19 @@
+#############
+# Libraries #
+#############
+
 library(tidyverse)
 library(ggpubr)
 
-#Upload TCGA file 
+########################
+# Read expression file #
+########################
+
 ER <- read.csv2("Ensembl_Metabric_17724_duplicates removed .csv",sep = ";", as.is = T, check.names = F)
 ER <- ER[,-c(2,3)]
 
 #Subset the gene of interest
-genes <- subset(ER, ER$Hugo_Symbol %in% c("TRIM45", "KLF4", 
+genes <- subset(ER, ER$Hugo_Symbol %in% c("TRIM45", "KLF4", "ESR1",
                                           "MYBL1", "HES1", "ASCL1", 
                                           "ELF3", "FOS", "MYB", "BATF", 
                                           "SOX3", "MYC", "ELF1", 
