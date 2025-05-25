@@ -1,27 +1,23 @@
-
-#Import the libraries
-library(ComplexHeatmap)
-library(RColorBrewer)
-library(gplots)
-library(circlize)
-library(dendextend)
+#############
+# Libraries #
+#############
 library(tidyverse)
 library(data.table)
-library(gson)
 
-#Read in the edge file 
+#########################
+# Read in the edge file #
+#########################
 expr <- as.data.frame(fread("C:/Users/abe186/UiT Office 365/O365-Phd Anne - General/NCMM/TCGA-BRCA/lioness_output/lioness_filtered_for_TFs_ESR1.csv"))
 head(expr)[1:5]
 
 #Filter gene of interest 
-
-expr <- subset(expr, expr$Target == "TRIM45")
+expr <- subset(expr, expr$Target == "GREB1")
 
 expr <- expr[,-1] #all targets are affected by ESR1
 rownames(expr) <- expr[,1]
 expr <- expr[,-1]
 
-#Replace the samp with TCGA-IDs
+#Replace the sample with TCGA-IDs
 id <- read.csv2("C:/Users/abe186/UiT Office 365/O365-Phd Anne - General/NCMM/TCGA-BRCA/raw_files/tcga_id.csv")
 id
 id$extra <- "c"
@@ -31,44 +27,33 @@ rownames(id) <- id[, 1]
 expr <- setnames(expr, rownames(id))
 head(expr)[1:5]
 
-
 #Load expression data 
 expr_1 <- fread("C:/Users/abe186/UiT Office 365/O365-PhD Anne - General/NCMM/TCGA-BRCA/raw_files/tcga_brca_er_positive_expr.csv",sep = ",")
-ann1 <- expr_1[,c("id", "ESR1", "TRIM45")]
+ann1 <- expr_1[,c("id", "ESR1", "TRIM45", "GREB1")]
 ann1 <- column_to_rownames(ann1, "id")
-
-clin <- read.csv2("C:/Users/abe186/UiT Office 365/O365-Phd Anne - General/NCMM/TCGA-BRCA/clinical_t45_ESR1_tcga_brca_receptor_status.csv")
-head(clin)
-clin$TRIM45_expression <- ifelse( clin$TRIM45 >= median(clin$TRIM45), 'High', "Low")
-clin$ESR1_expression <- ifelse(clin$ESR1 >= median(clin$ESR1), "High", "Low")
-clin <- clin[,-1]
-rownames(clin) <- clin[,1]
-clin <- clin[,-1]
-
 
 #The patients are in columns and genes in rownames
 all(rownames(ann1) == colnames(expr))
-all(rownames(clin) == colnames(expr))
+#all(rownames(clin) == colnames(expr))
 
 test <- expr
 
 test <- as.data.frame(t(test))
 test <- rownames_to_column(test, "id")
-test$GREB1 <- format(test$TRIM45, scientific = FALSE)
-test$TRIM45 <- as.numeric(test$TRIM45)
+test$GREB1 <- format(test$GREB1, scientific = FALSE)
+test$GREB1 <- as.numeric(test$GREB1)
 
 ann1 <- rownames_to_column(ann1, "id")
-colnames(ann1) <- c("id", "ESR1_exp", "TRIM45_exp")
+colnames(ann1) <- c("id", "ESR1_exp", "TRIM45_exp", "GREB1_exp")
 
 test <- merge(test,ann1 , by = "id")
 
 # Find the position where TRIM45 transitions from negative to positive
-separation_position <- which(sort(test$TRIM45) >= 0)[1]  # First position where TRIM45 >= 0
+separation_position <- which(sort(test$GREB1) >= 0)[1]  # First position where TRIM45 >= 0
 # Create the plot
-number <- as.data.frame(test$TRIM45 >0)
+number <- as.data.frame(test$GREB1 >0)
 
-
-p <-ggplot(test, aes(x = reorder(id, TRIM45), y = TRIM45, fill = TRIM45), color= NA) +
+p <-ggplot(test, aes(x = reorder(id, GREB1), y = GREB1, fill = GREB1), color= NA) +
   geom_bar(stat = "identity", )+
   geom_vline(xintercept = separation_position, linetype = "dashed", color = "black", size = 0.8, alpha = 0.8) +  # Add vertical line
   scale_fill_gradient(low = "#00CD00", high = "firebrick2") +  
@@ -98,15 +83,11 @@ dev.off()
 
 
 test$group <- ifelse(test$GREB1 >= 0, "Positive", "Negative")
-
-
-
 my_comparisons <- list( c("Negative", "Positive")) 
 symnum.args <- list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1), 
                     symbols = c("****", "***", "**", "*", "ns"))
 
-
-p <- ggplot(test, aes(x = group, y = ESR1_exp, fill = group))+
+p <- ggplot(test, aes(x = group, y = GREB1_exp, fill = group))+
   geom_point(alpha=0.5,position = position_jitter(), shape= 21, size= 6)+
   geom_boxplot(fill = "white", alpha = 0.8, outlier.shape = NA) +
   labs(y = expression(paste(italic("ESR1")~"(log2+1)")), 
@@ -123,7 +104,7 @@ p <- ggplot(test, aes(x = group, y = ESR1_exp, fill = group))+
                                  colour = "black")) +
   scale_fill_manual(values = c("#00CD00","firebrick2"))+ 
 ggpubr::geom_signif(comparisons = my_comparisons,map_signif_level = T, textsize=5, y_position = c(8.5))
-?geom_signif
+
 p
     
 # Save as PNG
@@ -134,6 +115,4 @@ dev.off()
 # Save as PDF
 pdf("esr1_greb1_expr_edge_weight_groups.pdf", width = 6, height = 6)  # PDF works with dimensions in inches
 plot(p)
-dev.off()
-
-    
+dev.off()  
