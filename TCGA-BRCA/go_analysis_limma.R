@@ -51,12 +51,12 @@ p <- barplot(unique_GO,
 p
 
 #Save the files 
-pdf("GO_enrichment_metabric_for_downregulated_genes_high_vs_low_trim45_MF.pdf", width = 8, height = 10, onefile = F)
+pdf("GO_enrichment_downregulated_genes_high_vs_low_trim45_BP.pdf", width = 8, height = 10, onefile = F)
 print(p)
 dev.off()
 
 
-png("GO_enrichment_for_downregulated_genes_high_vs_low_trim45_CC.png", res= 200, width = 1800, height = 2200)
+png("GO_enrichment_downregulated_genes_high_vs_low_trim45_BP.png", res= 200, width = 1800, height = 2200)
 print(p)
 dev.off()
 
