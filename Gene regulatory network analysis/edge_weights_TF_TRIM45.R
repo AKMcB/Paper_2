@@ -1,10 +1,13 @@
-#Import the libraries
+#############
+# Libraries #
+#############
 library(tidyverse)
 library(data.table)
 library(gson)
 
-
-#Read in the edge file 
+#########################
+# Read in the edge file #
+#########################
 expr <- as.data.frame(fread("C:/Users/abe186/UiT Office 365/O365-Phd Anne - General/NCMM/TCGA-BRCA/lioness_output/lioness_filtered_for_genes_trim45.csv"))
 head(expr)[1:5]
 
@@ -13,7 +16,6 @@ list1 <- read.gmt("C:/Users/abe186/UiT Office 365/O365-Phd Anne - General/NCMM/T
 
 list2 <- read.gmt("C:/Users/abe186/UiT Office 365/O365-Phd Anne - General/NCMM/TCGA-BRCA/gene_lists/HALLMARK_ESTROGEN_RESPONSE_LATE.v2023.2.Hs.gmt")
 
-####################
 #Combine the gene files
 genes <- rbind(list1, list2)
 nrow(genes)
@@ -29,7 +31,6 @@ expr <- subset(expr, expr$TF %in% genes$gene)
 expr <- expr[,-2] #all targets are affect TRIM45
 rownames(expr) <- expr[,1]
 expr <- expr[,-1]
-
 
 # Calculate the row sums (or use rowMeans for averages)
 row_means <- as.data.frame(rowMeans(expr))
@@ -69,8 +70,6 @@ p <-ggplot(row_means, aes(x = reorder(gene, value), y = value, fill = type), col
                              colour = "black"))
 
 p
-
-
 
 # Save as PNG
 png("edge_weight_TF_trim45_er_response_comb.png", width = 8, height = 6, units = "in", res = 300)  # Set resolution to 300 dpi for PNG
