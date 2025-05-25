@@ -1,8 +1,15 @@
-#Download libraries
+#############
+# Libraries #
+#############
+
 library(tibble)
 library(ggpubr)
-#-------------------------------------------------------------------------------
-setwd("C:/Users/abe186/UiT Office 365/O365-Bioinformatikk TRIM27 - General/TCGA-BRCA/Raw data")
+
+########################
+# Read expression data #
+########################
+
+setwd("C:/Users/abe186/UiT Office 365/O365-Phd Anne - General/TCGA-BRCA/Raw data")
 expr <- read.csv2("TMM_TCGA_BRCA_counts_log2.csv")
 rownames(expr) <- expr$X
 expr <- expr[,-1]
@@ -10,7 +17,6 @@ expr <- expr[,-1]
 expr <- as.data.frame(t(expr))
 expr <- tibble::rownames_to_column(expr, "id")
 expr$id <- gsub("\\.","-", expr$id)
-
 
 #Subset the df based on normal samples -11
 #grepl is to search for a specific pattern within a character vector or string
@@ -41,7 +47,6 @@ new_row <- rep("Tumor", 1105)
 # Add the new row to the dataframe using rbind()
 trim_tum <- rbind(trim_tum, new_row)
 
-
 rownames(normal) <- normal[,1]
 normal$id <- NULL
 normal <- as.data.frame(t(normal))
@@ -56,12 +61,12 @@ new_row <- rep("Normal", 114)
 # Add the new row to the dataframe using rbind()
 trim_nom <- rbind(trim_nom, new_row)
 
-
 trim_nom <- trim_nom[,-1]
 test <- cbind(trim_tum, trim_nom)
 
-#-------------------------------------------------------------------------------
-#Making boxplot
+###########
+# Boxplot #
+###########
 
 rownames(test) <- test[,1]
 test$Gene <- NULL
@@ -74,8 +79,6 @@ str(test)
 my_comparisons <- list( c("Tumor", "Normal") ) 
 symnum.args <- list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1), 
                     symbols = c("****", "***", "**", "*", "ns"))
-
-
 
 p <- ggboxplot(test, x="Sample", y="TRIM45",outlier.shape = NA,
                     show.legend=F,
@@ -92,19 +95,7 @@ p <- ggboxplot(test, x="Sample", y="TRIM45",outlier.shape = NA,
   geom_jitter(shape = 21,stroke=0.1,size=3, aes(fill= Sample, alpha=0.5), 
               position = position_jitter(width = 0.3, height = 0.5))
 
-
-
 p
 pdf("TRIM45_exp_normal_vs_tumor_2.pdf", height = 6, width = 6)
 print(p)
 dev.off()
-
-
-ggexport(p, filename = "TRIM45_exp_normal_vs_tumor_BRCA.pdf", height = 15, width = 15)
-ggexport(p, filename = "TRIM45_exp_normal_vs_tumor_BRCA.png",res=200, height = 2000, width = 2000)
-?ggexport
-rm(p)
-
-
-
-
