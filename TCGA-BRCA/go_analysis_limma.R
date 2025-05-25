@@ -27,7 +27,6 @@ df <- distinct(df)
 
 
 #Convert the gene symbols to ENTREZ ID
-#32 genes/proteins can not be converted -> 729 genes/proteins
 df <- clusterProfiler::bitr(geneID = df$hgnc_symbol,fromType="SYMBOL", toType="ENTREZID",
                             OrgDb="org.Hs.eg.db")
 
@@ -39,7 +38,7 @@ unique_GO <- enrichGO(gene = df$ENTREZID, #Your genes of interest
                       OrgDb = org.Hs.eg.db, #If no background is used, the function will use this instead
                       readable = T,
                       pvalueCutoff = 0.05, #It should be 0,05
-                      qvalueCutoff = 0.25) #It should be 0,25. But I have increased it to 1 because I didnot find any signficant GO terms for my genes.
+                      qvalueCutoff = 0.25) #It should be 0,25.
 
 
 #result <- unique_GO@result
