@@ -1,3 +1,6 @@
+#############
+# Libraries #
+#############
 library(edgeR)
 library(data.table)
 library(tidyverse)
@@ -6,11 +9,12 @@ library(Glimma)
 library(biomaRt)
 library(EnhancedVolcano)
 library(ggfortify)
+library(dplyr)
+
 ###################
 # Expression file #
 ###################
-
-expr <- as.data.frame(fread("TCGA-BRCA.htseq_counts.tsv"))
+expr <- as.data.frame(fread("Raw data/TCGA-BRCA.htseq_counts.tsv"))
 expr$Ensembl_ID <- gsub("\\..*","", expr$Ensembl_ID)
 #explore the expr file 
 #test <- as.data.frame(colnames(expr))
@@ -55,9 +59,10 @@ expr <- subset(expr, !rownames(expr) %in% c("__no_feature", "__ambiguous", "__to
 # Create group information # 
 ############################
 
-t45_1 <- read.csv2("clinical_t45_tcga_brca_limma.csv", header = TRUE)
+t45_1 <- read.csv2("limma/clinical_t45_ESR1_tcga_brca_receptor_status.csv", header = TRUE)
 t45_1 <- t45_1[,-1]
 
+t45_1$TRIM45_expression <- ifelse(t45_1$TRIM45 >= median(t45_1$TRIM45), 'High', "Low")
 #Take the top 25% highest expression vs bottom 25% 
 top <- t45_1 %>% filter(t45_1$TRIM45 > quantile(t45_1$TRIM45, 0.75))
 bottom <- t45_1 %>% filter(t45_1$TRIM45 < quantile(t45_1$TRIM45, 0.25))
@@ -140,11 +145,16 @@ lcpm <- cpm(d0, log=TRUE)
 
 #boxplot(lcpm,col=group)
 library(RColorBrewer)
-Shape <- c(0,1,2,3,4)
-col_sub <- subtype
-levels(col_sub) <-  brewer.pal(nlevels(col_sub), "Set1")
-col_sub
-subtype
+Shape <- c(0, 1, 2, 3, 4)
+pam50 <- factor(c("LumA", "LumB", "Normal", "Her2", "Basal"))
+
+col_sub <- brewer.pal(nlevels(pam50), "Set1")
+names(col_sub) <- levels(pam50)
+
+col_sub <- as.character(col_sub[pam50])
+plotMDS(lcpm, col=col_sub, pch=Shape)
+legend("bottomleft", col=c("#4DAF4A","#984EA3","#FF7F00","#377EB8","#E41A1C"),
+       pch=c(0, 1, 2, 3, 4), legend=c("Luminal A", "Luminal B", "Normal-like", "HER2-enriched", "Basal-like"))
 #luminal A = #4DAF4A
 #Luminal B = #984EA3 
 #Normal = #FF7F00
@@ -152,17 +162,53 @@ subtype
 #Basal = #E41A1C 
 #Levels: Basal Her2 LumA LumB Normal
 #Levels: #E41A1C #377EB8 #4DAF4A #984EA3 #FF7F00
-col_sub <- as.character(col_sub)
-plotMDS(lcpm, col=col_sub, pch=Shape) 
-legend("bottomleft", col=c("#4DAF4A","#984EA3","#FF7F00","#377EB8","#E41A1C"),pch = c(0,1,2,3,4), legend=c("Luminal A","Luminal B","Normal-like", "HER2-enriched", "Basal-like"))
+
 
 Shape_group <- c(0,1)
-col_group = group
+col_group = factor(c("High", "Low"))
 myColors <- c("red", "blue")
 levels(col_group) <- myColors
 col_group <- as.character(col_group)
 plotMDS(lcpm, col=col_group, pch=Shape_group)
 legend("bottomleft", col=c("red","blue"),pch = c(0,1), legend=c("High TRIM45","Low TRIM45"))
+
+#######
+# PCA #
+#######
+
+pca <- prcomp(
+  t(expr), # transpose our data frame to obtain PC scores for samples, not genes
+  scale = TRUE # we want the data scaled to have unit variance for each gene
+)
+pca_summary <- summary(pca)
+pca_summary$importance[, 1:100]
+
+merged <- rownames_to_column(merged, "id")
+meerged <- as.matrix(merged)
+expr <- as.matrix(expr)
+
+pca_df <- data.frame(pca$x[,1:2]) %>%
+  # Turn samples IDs stored as row names into a column
+  tibble::rownames_to_column("id") %>%
+  # Bring only the variables that we want from the metadata into this data frame
+  # here we are going to join by `refinebio_accession_code` values
+  dplyr::inner_join(
+    dplyr::select(merged, id, TRIM45_expression, `Pam50 + Claudin-low subtype`),
+    by = "id"
+  )
+
+
+pca_plot <- ggplot(pca_df,aes(x = PC1,y = PC2, color = TRIM45_expression)) +
+  geom_point() + # Plot individual points to make a scatterplot
+  theme_classic() # Format as a classic-looking plot with no gridlines
+
+# Print out the plot here
+pca_plot
+
+
+ggsave("pca_t45_level_metabric_top_bottom_25.pdf",plot = pca_plot)
+
+
 
 design <- model.matrix(~0+group+subtype)
 
@@ -183,8 +229,8 @@ efit <- eBayes(vfit)
 plotSA(efit, main="Final model: Mean-variance trend")
 summary(decideTests(efit))
 
-top.table <- topTable(efit, sort.by = "P", n = Inf, coef = 1, adjust.method = "none")
-fwrite(top.table, "limma_tcga_top_bottom_25/limma_trim45_top_bottom_tcga_brca_er_positive_no_corr.csv")
+top.table <- topTable(efit, sort.by = "P", n = Inf, coef = 1, adjust.method = "BH")
+write.csv2(top.table, "2025_03_25_limma_trim45_top_bottom_tcga_brca_er_positive_bh.csv")
 
 top.table <- subset(top.table, top.table$hgnc_symbol != "TRIM45")
 
@@ -196,13 +242,18 @@ v <- EnhancedVolcano(top.table,
                 title = "High TRIM45 vs Low TRIM45",
                 x = 'logFC',
                 y = 'adj.P.Val',
+                caption = paste(
+                  "Total significant genes (Padj): ",
+                  sum(top.table$adj.P.Val < 0.05), ", Up: ",
+                  sum(top.table$adj.P.Val < 0.05 & top.table$logFC > 0), " Down: ",
+                  sum(top.table$adj.P.Val < 0.05 & top.table$logFC < -0)),
                 colAlpha = 0.5)
 v
 
-pdf("limma_tcga_top_bottom_25/volcanoplot_limma_trim45_top_bottom_tcga_brca_er_positive_no_corr.pdf", heigh = 10, width =10)
+pdf("2025_03_25_volcanoplot_limma_trim45_top_bottom_tcga_brca_er_positive_bh.pdf", heigh = 10, width =10)
 print(v)
 dev.off()
 
-png("limma_tcga_top_bottom_25/volcanoplot_limma_trim45_top_bottom_tcga_brca_er_positive_no_corr.png",res= 200, heigh = 2000, width =1800)
+png("limma/limma_tcga_top_bottom_25/volcanoplot_limma_trim45_top_bottom_tcga_brca_er_positive_no_corr.png",res= 200, heigh = 2000, width =1800)
 print(v)
 dev.off()
