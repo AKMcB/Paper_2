@@ -1,15 +1,14 @@
-###################
-## Load libaries ##
-###################
-
+#################
+# Load libaries #
+#################
 library(ggpubr)
 library(tidyverse)
 
-##########################
-## Load expression data ##
-##########################
+########################
+# Load expression data #
+########################
 
-setwd("C:/Users/abe186/UiT Office 365/O365-Bioinformatikk TRIM27 - General/Metabric")
+setwd("C:/Users/abe186/UiT Office 365/O365-Phd Anne - General/Metabric")
 expr <- read.csv2("Ensembl_Metabric_17724_duplicates removed .csv", sep=";", as.is = T, check.names = F)
 expr <- expr[,-c(2,3)]
 
@@ -22,7 +21,6 @@ rm(dup)
 
 genes <- subset(expr, expr$Hugo_Symbol %in% c("TRIM27", "TRIM32", "TRIM45"))
 
-
 #Remove the default rownames and add the gene name as row name of the data
 rownames(genes) <- genes[,1]
 genes <- genes[,-1]
@@ -31,16 +29,15 @@ genes <- genes[,-1]
 #t-transpose data t(x)
 t_genes <- t(genes)
 
-
 #Convert it into a dataframe and add a column with the patient ids
 t_genes <- as.data.frame(t_genes)
 t_genes$Meta_id <- rownames(t_genes)
 
 #write.csv(t_genes, "autophagy receptors_Metabric.csv")
 
-######################## 
-## Read clinical info ##
-########################
+######################
+# Read clinical info #
+######################
 
 ids <- read.csv2("brca_metabric_clinical_data.csv", sep=";", as.is = T, check.names = F)
 ids <- ids[,c(2,10)]
@@ -66,15 +63,15 @@ merged<- merged[, -1]
 
 merged$`Pam50 + Claudin-low subtype` <- gsub("claudin-low", "Basal", merged$`Pam50 + Claudin-low subtype`)
 
+table(merged$`Pam50 + Claudin-low subtype`)
 
 colnames(merged)[4] <- "PAM50"
 
+####################
+# Make the boxplot #
+####################
 
-######################
-## Make the boxplot ##
-######################
-
-merged$PAM50    <- factor(merged$PAM50, 
+merged$PAM50   <- factor(merged$PAM50, 
                                        levels= c("LumA", "LumB", "Her2", "Basal", "Normal"), 
                                        labels = c("Luminal A", "Luminal B", "HER2-enriched", "Basal-like", "Normal-like"))
 my_comparisons <- list( c("Luminal A", "HER2-enriched"),
@@ -87,9 +84,7 @@ my_comparisons <- list( c("Luminal A", "HER2-enriched"),
 symnum.args <- list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1), 
                     symbols = c("****", "***", "**", "*", "ns"))
 
-
 merged <- merged[complete.cases(merged), ]
-
 
 p <- ggplot(merged, aes(x = PAM50, y = TRIM45, fill = PAM50))+
   geom_point(alpha=0.5,position = position_jitter(width = 0.3, height = 0.5), shape= 21, size= 3)+
@@ -113,6 +108,3 @@ p
 pdf("TRIM45_exp_metabric_PAM50_3.pdf", height = 6, width = 6)
 print(p)
 dev.off()
-
-
-ggexport(p, filename = "TRIM45_exp_PAM50_subtype_Metabric.png",res = 200, height = 2000, width = 2000)
