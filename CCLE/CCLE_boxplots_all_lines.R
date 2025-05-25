@@ -1,12 +1,19 @@
+#############
+# Libraries #
+#############
+
 library(tibble)
 library(dplyr)
 library(ggpubr)
 library(ggplot2)
 library(tidytext)
 setwd("C:/Users/abe186/UiT Office 365/O365-Bioinformatikk TRIM27 - General/Cancer cell lines cyclopedia/Raw Data")
-#Start here when working with new genes----------------------------------------------------------------------
-t45 <- read.csv2("CCLE_TRIM45_exp_info_Cancer_Codes.csv", sep = ";", as.is = T, check.names = F)
 
+########################
+# Read expression data #
+########################
+
+t45 <- read.csv2("CCLE_TRIM45_exp_info_Cancer_Codes.csv", sep = ";", as.is = T, check.names = F)
 
 t45 <- t45[complete.cases(t45), ] #Remove NA
 dup<-t45[duplicated(t45$ID),] #Check for duplicate samples
@@ -16,8 +23,7 @@ t45$TRIM45<- as.numeric(t45$TRIM45)
 t45 <-t45[order(t45$TRIM45, decreasing = TRUE),]
 str(t45)
 
-
-fac <- with(t45, reorder(OncotreeCode, TRIM45, median, decreasing = TRUE))
+fac <- with(t45, reorder(OncotreeCode, TRIM45, median, decreasing = FALSE))
 t45$OncotreeCode <- factor(t45$OncotreeCode, levels = levels(fac))
 
 t45 <- t45[!t45$Differentiation %in% c("Mixed", "Non-Epithelial"),] #We are only interested in epthelial cells
