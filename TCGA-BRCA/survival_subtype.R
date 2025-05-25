@@ -1,10 +1,15 @@
-#Libraries
+#############
+# Libraries #
+#############
 library(tidyverse)
 library(data.table)
 library(survival)
 library(survminer)
 setwd("C:/Users/abe186/UiT Office 365/O365-Phd Anne - General/TCGA-BRCA/Kaplan-Meier/Receptor Status TRIM45")
-#Upload TCGA file 
+
+########################
+# Read expression file #
+########################
 ER <- fread("gdc_brca_expr_edit.csv",sep = ";")
 ER <- ER[,-2]
 
@@ -36,7 +41,6 @@ info_pfi <- merge(genes, info_pfi, by.x = "ID", by.y = "TCGA_id")
 
 shapiro.test(info_dss$TRIM45)
 hist(info_dss$TRIM45)
-
 
 info_dss <- subset(info_dss, info_dss$BRCA_Subtype_PAM50 == "Normal")
 hist(info_dss$TRIM45)
