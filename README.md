@@ -53,7 +53,7 @@
 - **go_analysis_metabric.R**
     - Performs GO enrichemnt of LIMMA results. 
 
-#### `Gene regulatory network analysis`
+#### Gene regulatory network analysis
 - **edge_weights_TF_TRIM45.R**
     - Explores the edge weights between ESR1 and TRIM45 in TCGA-BRCA ER-positive patients. 
 - **edge_weights_TF_TRIM45.R**
