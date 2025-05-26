@@ -7,7 +7,7 @@
 - **METABRIC**: Scripts for the data from METABRIC
 - **Gene regulatory network**: Scripts for handling edge weights
 
-##### CCLE 
+#### CCLE 
 - **CCLE_preprocessing.R**
     - Preprocessing of CCLE data.
 - **CCLE_boxplots_all_lines.R**
@@ -15,11 +15,11 @@
 - **Breast cancer cell lines_script_V4_boxplot.R**
     - This scripts explores breast cancer cell lines from CCLE and the expression of a specific gene.
 
-##### PANCAN 
+#### PANCAN 
 - **PanCan_Exp_boxplot.R** 
     - This script explore the PanCan data and the expression of a specific gene, and include all the 33 cancer types. 
 
-##### TCGA-BRCA 
+#### TCGA-BRCA 
 - **Survival_script_TCGA_ER_Status_V3.R** 
    - This script explores the different survival parameters such as disease-specific survival and progression free survival in TCGA-BRCA, based on the expression values of specific genes. It also includes calculations for GMM. 
 - **survival_subtype.R**
@@ -53,7 +53,7 @@
 - **go_analysis_metabric.R**
     - Performs GO enrichemnt of LIMMA results. 
 
-##### Gene regulatory network analysis
+#### Gene regulatory network analysis
 - **edge_weights_TF_TRIM45.R**
     - Explores the edge weights between ESR1 and TRIM45 in TCGA-BRCA ER-positive patients. 
 - **edge_weights_TF_TRIM45.R**
