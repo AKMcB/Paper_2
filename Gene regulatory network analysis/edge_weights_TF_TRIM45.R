@@ -32,7 +32,7 @@ expr <- expr[,-2] #all targets are affect TRIM45
 rownames(expr) <- expr[,1]
 expr <- expr[,-1]
 
-# Calculate the row sums (or use rowMeans for averages)
+# row sums
 row_means <- as.data.frame(rowMeans(expr))
 row_means
 
@@ -40,11 +40,11 @@ row_means <- rownames_to_column(row_means, "gene")
 colnames(row_means)[2] <- "value"
 
 row_means$type <- ifelse(row_means$value >=0, "Positive", "Negative")
-# Get the indices of the top 10 and bottom 10 rows
+# Get the top 10 and bottom 10 rows
 #top_10_indices <- order(row_means, decreasing = TRUE)[1:10]
 #bottom_10_indices <- order(row_means, decreasing = FALSE)[1:10]
 
-# Extract the row means for the top and bottom 10 rows
+# Extract the top and bottom 10 rows
 #top_10_means <- row_means[top_10_indices]
 #bottom_10_means <- row_means[bottom_10_indices]
 
@@ -71,12 +71,10 @@ p <-ggplot(row_means, aes(x = reorder(gene, value), y = value, fill = type), col
 
 p
 
-# Save as PNG
-png("edge_weight_TF_trim45_er_response_comb.png", width = 8, height = 6, units = "in", res = 300)  # Set resolution to 300 dpi for PNG
+png("edge_weight_TF_trim45_er_response_comb.png", width = 8, height = 6, units = "in", res = 300)  
 plot(p)
 dev.off()
 
-# Save as PDF
-pdf("edge_weight_TF_TRIM45_er_response_comb.pdf", width = 6, height = 4)  # PDF works with dimensions in inches
+pdf("edge_weight_TF_TRIM45_er_response_comb.pdf", width = 6, height = 4)  
 plot(p)
 dev.off()
