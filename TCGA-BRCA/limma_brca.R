@@ -176,9 +176,7 @@ legend("bottomleft", col=c("red","blue"),pch = c(0,1), legend=c("High TRIM45","L
 # PCA #
 #######
 
-pca <- prcomp(
-  t(expr), 
-  scale = TRUE)
+pca <- prcomp(t(expr), scale = TRUE)
 pca_summary <- summary(pca)
 pca_summary$importance[, 1:100]
 
@@ -188,8 +186,7 @@ expr <- as.matrix(expr)
 
 pca_df <- data.frame(pca$x[,1:2]) %>%
   rownames_to_column("id") %>%
-  inner_join(select(merged, id, TRIM45_expression, `Pam50 + Claudin-low subtype`),
-    by = "id")
+  inner_join(select(merged, id, TRIM45_expression, `Pam50 + Claudin-low subtype`),by = "id")
 
 pca_plot <- ggplot(pca_df,aes(x = PC1,y = PC2, color = TRIM45_expression)) +
   geom_point() + 
